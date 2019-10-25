@@ -3,3 +3,5 @@ str(raw_data)
 
 head(raw_data)
 tail(raw_data)
+
+summary(raw_data)
