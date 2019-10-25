@@ -5,3 +5,6 @@ head(raw_data)
 tail(raw_data)
 
 summary(raw_data)
+
+nrow(is.na(raw_data$air2))
+summary(raw_data$air2)
