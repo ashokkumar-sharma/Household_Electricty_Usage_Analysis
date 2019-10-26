@@ -1,10 +1,12 @@
 #install.packages("stringr")
+#install.packages("tidyr")
+#install.packages("hms")
 library(stringr)
+library(tidyr)
+library(hms)
 
- #
-data <- read.csv("../Pecan_70_Houses_2017.csv", header = TRUE, sep = ",")
 #
-raw_data <- data
+raw_data <- read.csv("../Pecan_70_Houses_2017.csv", header = TRUE, sep = ",")
 #
 str(raw_data)
 
@@ -32,20 +34,42 @@ raw_data <- raw_data[-which(raw_data$dataid == ""), ]
 #
 unique(raw_data$dataid)
 length(unique(raw_data$dataid))         #
-
-range(raw_data$air1)
-class(raw_data$dataid)
 raw_data$dataid <- as.integer(raw_data$dataid)
 
 length(unique(raw_data$dataid[which(raw_data$car1 != 0)]))
-which(raw_data$dataid == "7024")
 
 length(unique(raw_data$dataid[which(raw_data$gen != 0)]))
 
-length(which(is.na(raw_data$car1)))
-
 raw_data[is.na(raw_data)] <- 0
 
-length(is.na(raw_data))
+class(raw_data$localminute)
+library(tidyr)
+raw_data = separate(raw_data,localminute,into=c("date","time"),sep=" ") 
+tail(raw_data)
+
+raw_data$date = as.character(raw_data$date)
+a <- as.Date(raw_data$date,format="%Y-%m-%d") # Produces NA when format is not "%Y-%m-%d"
+b <- as.Date(raw_data$date,format="%m/%d/%Y") # Produces NA when format is not "%m/%d/%Y"
+a[is.na(a)] <- b[!is.na(b)] # Combine both while keeping their ranks
+raw_data$date <- a # Put it back in your dataframe
+class(raw_data$date)
+head(raw_data$date)
+
+#
+time <- raw_data$time
+time = as.character(time)
+time = substr(time,1,5)
+time = paste(time,"00", sep=":")
+
+#
+raw_data$time <- as_hms(time)
+class(raw_data$time)
+head(raw_data$time)
+
+#
+clean_data <- raw_data
+
+#
+write.csv(clean_data,file='../clean_data.csv')
 
 
