@@ -1,10 +1,34 @@
-raw_data <- read.csv("../Pecan_70_Houses_2017.csv", header = TRUE, sep = ",")
+#install.packages("stringr")
+library(stringr)
+
+#
+data <- read.csv("../Pecan_70_Houses_2017.csv", header = TRUE, sep = ",")
+#
+raw_data <- data
+#
 str(raw_data)
 
-head(raw_data)
-tail(raw_data)
+#
+unique(raw_data$dataid)
+#
+raw_data$dataid <- str_remove(raw_data$dataid, "ï»¿")
+#
+unique(raw_data$dataid)
+#
+which(raw_data$dataid == "")            #8808547
+#
+raw_data$dataid[c(8808546, 8808548)]
+#
+dataid_levels <- unique(raw_data$dataid)
+i=0
+for(i in dataid_levels){
+  print(length(which(raw_data$dataid == i)))
+  i = dataid_levels["i+1"]
+}
 
-summary(raw_data)
+#
+raw_data <- raw_data[-which(raw_data$dataid == ""), ]
 
-nrow(is.na(raw_data$air2))
-summary(raw_data$air2)
+#
+unique(raw_data$dataid)
+length(unique(raw_data$dataid))         #
