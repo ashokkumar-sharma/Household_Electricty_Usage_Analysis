@@ -1,14 +1,15 @@
 #install.packages("stringr")
 #install.packages("tidyr")
 #install.packages("hms")
+#install.packages('corrplot')
 library(stringr)
 library(tidyr)
 library(hms)
+library(corrplot)
+library(ggplot2)
 
 #
-data <- read.csv("../Pecan_70_Houses_2017.csv", header = TRUE, sep = ",")
-#
-raw_data <- data
+raw_data <- read.csv("../Pecan_70_Houses_2017.csv", header = TRUE, sep = ",")
 #
 str(raw_data)
 
@@ -69,6 +70,57 @@ class(raw_data$time)
 head(raw_data$time)
 
 #
-write.csv(raw_data,file='../clean_data.csv')
+clean_data <- raw_data
+
+#
+write.csv(clean_data,file='../clean_data.csv')
 
 
+head(clean_data$time)
+
+
+colnames(clean_data)
+
+c <-subset(clean_data, select = c(car1, gen, grid, use))
+correlation <- cor(c)
+corrplot(correlation, method = "number")
+
+
+x <- subset(clean_data, car1 != 0 & gen != 0, select = c(gen, car1))
+head(x)
+summary(x)
+str(x)
+c <- cor(x)
+corrplot(c, method = "number")
+
+
+
+jpeg(filename = "car1_gen_cor.jpeg")
+ggplot(x, aes(gen, car1))+
+  geom_smooth(method = "lm")
+dev.off()
+
+jpeg(filename = "car1_clean_boxplot.jpeg")
+boxplot(clean_data$car1, ylab = "Electric Vehicle eGauge (car1)", main = "Boxplot of Electric Vehicle eGauge")
+dev.off()
+
+jpeg(filename = "gen_clean_boxplot.jpeg")
+boxplot(clean_data$gen, ylab = "Solar Generated eGauge (gen)", main = "Boxplot of Solar generated eGauge")
+dev.off()
+
+clean_data <- clean_data[-which(clean_data$car1 == max(clean_data$car1)), ]
+summary(clean_data$car1)
+
+clean_data <- clean_data[-which(clean_data$gen == max(clean_data$gen)), ]
+summary(clean_data$gen)
+
+
+y <- subset(clean_data, car1 != 0 | gen != 0, select = c(gen, car1))
+summary(y)
+jpeg(filename = "car1_gen_cor2.jpeg")
+ggplot(y, aes(gen, car1))+
+  geom_smooth(method = "lm")
+dev.off()
+
+d <- cor(x)
+corrplot(d, method = "number")
